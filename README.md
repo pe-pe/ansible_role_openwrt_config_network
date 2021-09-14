@@ -1,6 +1,8 @@
 OpenWRT Config Network
 =========
 
+[![Role](https://img.shields.io/ansible/role/56237.svg)](https://galaxy.ansible.com/pe_pe/openwrt_config_network/)
+[![Quality](https://img.shields.io/ansible/quality/56237.svg)](https://galaxy.ansible.com/pe_pe/openwrt_config_network/)
 [![CI](https://github.com/pe-pe/ansible_role_openwrt_config_network/workflows/CI/badge.svg)](https://github.com/pe-pe/ansible_role_openwrt_config_network/actions)
 
 Ansible role that configures network settings of OpenWRT device (mainly those which are usually defined in `/etc/config/network`).
