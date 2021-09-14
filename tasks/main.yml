@@ -1,0 +1,60 @@
+---
+# Variables used in tasks:
+# - openwrt_config_network (dict)
+
+- name: Revert pending UCI changes
+  uci:
+    command: revert
+    key: network
+  when:
+    - openwrt_config_network is defined
+
+- name: Configure globals section
+  uci:
+    command: section
+    key: network.globals
+    type: globals
+    value:
+      ula_prefix: '{{ openwrt_config_network.globals.ula_prefix | default() }}'
+  when:
+    - openwrt_config_network.globals is defined
+
+# Configure interfaces except ifname (done in next step)
+- name: Configure interfaces sections
+  uci:
+    command: section
+    key: "network.{{ item.key }}"
+    type: interface
+    value:
+      proto: "{{ item.value.proto | default('dhcp') }}"
+      ipaddr: "{{ item.value.ipaddr | default() }}"
+      netmask: "{{ item.value.netmask | default() }}"
+      gateway: "{{ item.value.gateway | default() }}"
+      username: "{{ item.value.username | default() }}"
+      password: "{{ item.value.password | default() }}"
+      defaultroute: "{{ item.value.defaultroute | default() }}"
+      metric: "{{ item.value.metric | default() }}"
+      dns: "{{ item.value.dns | default([]) }}"
+  with_dict: "{{ openwrt_config_network.interfaces }}"
+  when: openwrt_config_network.interfaces is defined
+
+# Separate section for ifname to avoid removal in case not set
+# as usually it's hardware specific for main interfaces
+- name: Configure interfaces (ifname)
+  uci:
+    command: section
+    key: "network.{{ item.key }}"
+    type: interface
+    value:
+      ifname: "{{ item.value.ifname }}"
+  with_dict: "{{ openwrt_config_network.interfaces }}"
+  when:
+    - openwrt_config_network.interfaces is defined
+    - item.value.ifname is defined
+
+- name: Commit UCI changes done
+  uci:
+    command: commit
+  when:
+    - openwrt_config_network is defined
+  notify: Restart network

@@ -1,0 +1,5 @@
+---
+- name: Restart network
+  nohup:
+    command: /etc/init.d/network restart
+    delay: 1

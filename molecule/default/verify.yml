@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  vars_files:
+    - vars.yml
+
+  roles:
+    - role: ansible_role_openwrt
+
+  tasks:
+    # network config test
+    - name: Check whether network configuration was set
+      command: "uci show network"
+      register: uci_show_network_result
+      failed_when:
+        - not "globals.ula_prefix='" ~ openwrt_config_network.globals.ula_prefix ~ "'" in uci_show_network_result.stdout or
+          not "test=interface" in uci_show_network_result.stdout or
+          not "test.proto='" ~ openwrt_config_network.interfaces.test.proto ~ "'" in uci_show_network_result.stdout or
+          not "test.ipaddr='" ~ openwrt_config_network.interfaces.test.ipaddr ~ "'" in uci_show_network_result.stdout or
+          not "test.netmask='" ~ openwrt_config_network.interfaces.test.netmask ~ "'" in uci_show_network_result.stdout or
+          not "test.gateway='" ~ openwrt_config_network.interfaces.test.gateway ~ "'" in uci_show_network_result.stdout or
+          not "test.metric='" ~ openwrt_config_network.interfaces.test.metric ~ "'" in uci_show_network_result.stdout or
+          not "test.dns='" ~ openwrt_config_network.interfaces.test.dns[0] ~ "'" in uci_show_network_result.stdout or
+          not "test_dhcp=interface" in uci_show_network_result.stdout or
+          not "test_dhcp.proto='dhcp'" in uci_show_network_result.stdout or
+          not "test_dhcp.ifname='" ~ openwrt_config_network.interfaces.test_dhcp.ifname ~ "'" in uci_show_network_result.stdout
+      changed_when: false
