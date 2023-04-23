@@ -3,3 +3,10 @@
   nohup:
     command: /etc/init.d/network restart
     delay: 1
+
+- name: Wait for connection (network)
+  wait_for_connection:
+    timeout: 600
+    delay: 5
+  listen:
+    - Restart network
